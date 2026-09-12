@@ -93,6 +93,235 @@
         
         <h3 style="color: #58a6ff; margin-top: 25px;">💻 Полный код моих Telegram-ботов (Python)</h3>
         <pre><code id="codeBlock"># -*- coding: utf-8 -*-
+            import telebot
+from telebot import types
+
+# --- НАСТРОЙКА БОТА ---
+TOKEN = '8517325739:AAFvqyS4Y45Ps48W7z9dtntGK64XtF9FGNc'
+bot = telebot.TeleBot(TOKEN)
+
+# --- ГЛАВНОЕ МЕНЮ ---
+def get_main_keyboard():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    btn_theory = types.KeyboardButton('📖 Теория (Python)')
+    btn_practice = types.KeyboardButton('📝 Практика (Тесты)')
+    btn_math = types.KeyboardButton('🔢 Математика и ИТ')
+    markup.add(btn_theory, btn_practice, btn_math)
+    return markup
+
+# --- КНОПКА "НАЗАД" ---
+def get_back_keyboard():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(types.KeyboardButton('🔙 В главное меню'))
+    return markup
+
+# ==================================================
+# # 1. ОБРАБОТКА КОМАНД (ИЗ МЕНЮ BOTFATHER)
+# ==================================================
+
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    student_name = message.from_user.first_name if message.from_user.first_name else "ученик"
+    welcome_text = (
+        f"Привет, {student_name}! 👋\n\n"
+        "🤖 Я твой интерактивный помощник по **Информатике и программированию на Python**!\n\n"
+        "Здесь ты сможешь легко разобрать сложные темы, потренироваться перед контрольными "
+        "и прокачать свои навыки кода.\n\n"
+        "Выбери нужный раздел на клавиатуре ниже 👇"
+    )
+    bot.send_message(message.chat.id, welcome_text, reply_markup=get_main_keyboard(), parse_mode="Markdown")
+
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    help_text = (
+        "❓ **Справка по использованию бота:**\n\n"
+        "• Нажимай кнопки меню внизу экрана или используй команды.\n"
+        "• `/python`, `/pascal` — синтаксис языков.\n"
+        "• `/algo` — шпаргалки по алгоритмам.\n"
+        "• `/logic` — логика и таблицы истинности.\n"
+        "• `/bin` — системы счисления.\n"
+        "• `/quiz` — быстрый запуск тестов."
+    )
+    bot.send_message(message.chat.id, help_text, parse_mode="Markdown")
+
+@bot.message_handler(commands=['python'])
+def python_command(message):
+    inline_kb = types.InlineKeyboardMarkup(row_width=1)
+    inline_kb.add(
+        types.InlineKeyboardButton("🐍 Тема 1: Переменные и типы данных", callback_data="theory_1"),
+        types.InlineKeyboardButton("🔄 Тема 2: Условия (if/else) и циклы", callback_data="theory_2"),
+        types.InlineKeyboardButton("📋 Тема 3: Списки и их методы", callback_data="theory_3")
+    )
+    bot.send_message(message.chat.id, "🐍 **Теория Python**\nВыбери интересующую тему:", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    bot.send_message(message.chat.id, "Доступные уроки:", reply_markup=inline_kb)
+
+@bot.message_handler(commands=['pascal'])
+def pascal_command(message):
+    pascal_text = (
+        "📑 **Базовый синтаксис PascalABC:**\n\n"
+        "```pascal\n"
+        "program MyProgram;\n"
+        "var\n"
+        "  a: integer; { переменная целого типа }\n"
+        "begin\n"
+        "  writeln('Привет, мир!'); { вывод текста }\n"
+        "  readln(a); { ввод значения }\n"
+        "end.\n"
+        "```\n"
+        "Рекомендуем постепенно переходить на Python, так как он чаще используется на ОГЭ/ЕГЭ!"
+    )
+    bot.send_message(message.chat.id, pascal_text, parse_mode="Markdown")
+
+@bot.message_handler(commands=['algo'])
+def algo_command(message):
+    algo_text = (
+        "🔄 **Основные алгоритмы (Цикл For):**\n\n"
+        "Пример классического цикла, который повторяется 5 раз (от 0 до 4):\n"
+        "```python\n"
+        "for i in range(5):\n"
+        "    print('Итерация №', i)\n"
+        "```\n"
+        "Используется для перебора списков, строк и выполнения одинаковых действий."
+    )
+    bot.send_message(message.chat.id, algo_text, parse_mode="Markdown")
+
+@bot.message_handler(commands=['logic'])
+def logic_command(message):
+    logic_text = (
+        "🧠 **Математическая логика:**\n\n"
+        "• `and` (Конъюнкция / И) — истинно, только если **оба** выражения истинны.\n"
+        "• `or` (Дизъюнкция / ИЛИ) — истинно, если истинно **хотя бы одно** выражение.\n"
+        "• `not` (Инверсия / НЕ) — меняет истину на ложь, а ложь на истину."
+    )
+    bot.send_message(message.chat.id, logic_text, parse_mode="Markdown")
+
+@bot.message_handler(commands=['bin'])
+def bin_command(message):
+    bin_text = (
+        "🔢 **Системы счисления:**\n\n"
+        "В Python переводить числа очень просто:\n"
+        "• Из 10-ичной в 2-ичную: `bin(10)` -> `'0b1010'`\n"
+        "• Из 2-ичной в 10-ичную: `int('1010', 2)` -> `10`"
+    )
+    bot.send_message(message.chat.id, bin_text, parse_mode="Markdown")
+
+@bot.message_handler(commands=['quiz'])
+def quiz_command(message):
+    inline_kb = types.InlineKeyboardMarkup(row_width=1)
+    inline_kb.add(
+        types.InlineKeyboardButton("🎯 Тест: Основы Python", callback_data="quiz_python"),
+        types.InlineKeyboardButton("💻 Тест: Логика и алгоритмы", callback_data="quiz_logic")
+    )
+    bot.send_message(message.chat.id, "🎯 **Практика**\nПроверь свои знания! Выбери тест:", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    bot.send_message(message.chat.id, "Доступные тесты:", reply_markup=inline_kb)
+
+# ==================================================
+# # 2. ОБРАБОТКА НАЖАТИЙ НА КНОПКИ (ОСНОВНАЯ ЛОГИКА)
+# ==================================================
+
+@bot.message_handler(content_types=['text'])
+def handle_buttons(message):
+    if message.text == '🔙 В главное меню':
+        bot.send_message(
+            message.chat.id,
+            "Вы вернулись в главное меню. Что изучаем дальше?",
+            reply_markup=get_main_keyboard()
+        )
+    
+    elif message.text == '📖 Теория (Python)':
+        inline_kb = types.InlineKeyboardMarkup(row_width=1)
+        inline_kb.add(
+            types.InlineKeyboardButton("🐍 Тема 1: Переменные и типы данных", callback_data="theory_1"),
+            types.InlineKeyboardButton("🔄 Тема 2: Условия (if/else) и циклы", callback_data="theory_2"),
+            types.InlineKeyboardButton("📋 Тема 3: Списки и их методы", callback_data="theory_3")
+        )
+        bot.send_message(
+            message.chat.id,
+            "📖 **Теория Python**\nВыбери тему, которую хочешь изучить простым языком:",
+            reply_markup=get_back_keyboard(),
+            parse_mode="Markdown"
+        )
+        bot.send_message(message.chat.id, "Доступные уроки:", reply_markup=inline_kb)
+
+    elif message.text == '📝 Практика (Тесты)':
+        inline_kb = types.InlineKeyboardMarkup(row_width=1)
+        inline_kb.add(
+            types.InlineKeyboardButton("🎯 Тест: Основы Python", callback_data="quiz_python"),
+            types.InlineKeyboardButton("💻 Тест: Логика и алгоритмы", callback_data="quiz_logic")
+        )
+        bot.send_message(
+            message.chat.id,
+            "📝 **Практика**\nПроверь свои знания! Выбери тест:",
+            reply_markup=get_back_keyboard(),
+            parse_mode="Markdown"
+        )
+        bot.send_message(message.chat.id, "Доступные тесты:", reply_markup=inline_kb)
+
+    elif message.text == '🔢 Математика и ИТ':
+        math_text = (
+            "🔢 **Математика в Информатике**\n\n"
+            "Здесь собраны подсказки для школьной программы:\n\n"
+            "1️⃣ **Системы счисления:** Как переводить числа? \n"
+            "• Из двоичной в десятичную: разбиваем по степеням двойки справа налево (начиная с 0).\n"
+            "• В Python для этого есть функции: `bin(10)` -> `'0b1010'`, `int('1010', 2)` -> `10`.\n\n"
+            "2️⃣ **Шпаргалка по степеням двойки:**\n"
+            "• 2⁰ = 1, 2¹ = 2, 2² = 4, 2³ = 8\n"
+            "• 2⁴ = 16, 2⁵ = 32, 2⁶ = 64, 2⁷ = 128\n"
+            "• 2⁸ = 256, 2⁹ = 512, 2¹⁰ = 1024 (1 Кбайт!)"
+        )
+        bot.send_message(message.chat.id, math_text, reply_markup=get_back_keyboard(), parse_mode="Markdown")
+
+# ==================================================
+# # 3. ОБРАБОТКА НАЖАТИЙ НА ВНУТРЕННИЕ (INLINE) КНОПКИ
+# ==================================================
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_inline_buttons(call):
+    if call.data == "theory_1":
+        text = (
+            "📌 **Тема 1: Переменные и типы данных**\n\n"
+            "Представь, что переменная — это **коробка с наклейкой**. "
+            "На наклейке написано имя, а внутри лежит значение.\n"
+            "```python\n"
+            "x = 5 # Целое число (int)\n"
+            "name = 'Алексей' # Текст/Строка (str)\n"
+            "pi = 3.14 # Дробное число (float)\n"
+            "```\n"
+            "Команда `print(x)` выведет то, что лежит в коробке!"
+        )
+        bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
+        
+    elif call.data == "theory_2":
+        text = (
+            "📌 **Тема 2: Условия (if/else)**\n\n"
+            "Это как выбор пути в реальной жизни: *Если* на улице дождь — беру зонт, *иначе* — не беру.\n"
+            "```python\n"
+            "if weather == 'rain':\n"
+            "    print('Беру зонт! ☔')\n"
+            "else:\n"
+            "    print('Иду так! ☀️')\n"
+            "```\n"
+            "⚠️ Важно: после `if` и `else` всегда ставится **двоеточие**, а код внутри пишется с **отступом в 4 пробела**!"
+        )
+        bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
+        
+    elif call.data == "theory_3":
+        text = (
+            "📌 **Тема 3: Списки (Lists)**\n\n"
+            "Список — это одна коробка, в которой лежит сразу много вещей по порядку. "
+            "Каждой вещи присвоен номер (индекс), **начиная с 0**!\n"
+            "```python\n"
+            "fruits = ['яблоко', 'банан', 'апельсин']\n"
+            "print(fruits[0]) # Выведет: яблоко\n\n"
+            "# Как добавить элемент?\n"
+            "fruits.append('киви') # Теперь киви тоже в списке!\n"
+            "```"
+        )
+        bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
+        
+    elif call.data == "quiz_python":
+        bot.send_poll(
+
 </code></pre>
     </div>
 
