@@ -3,33 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход на сайт</title>
+    <title>Личный кабинет разработчика</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #121212;
+            background-color: #0d1117;
             color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .login-container {
-            background-color: #1e1e1e;
+            background-color: #161b22;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             text-align: center;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #30363d;
         }
-        input [type="password"] {
+        .cabinet-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #161b22;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        input[type="password"] {
             padding: 10px;
             width: 80%;
             margin-bottom: 15px;
-            border: 1px solid #333;
-            background-color: #2a2a2a;
+            border: 1px solid #30363d;
+            background-color: #0d1117;
             color: #fff;
             border-radius: 4px;
+            outline: none;
         }
         button {
             padding: 10px 20px;
@@ -38,44 +53,152 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            font-weight: bold;
         }
         button:hover { background-color: #2ea043; }
         .error { color: #ff7b72; margin-top: 10px; font-size: 14px; }
+        pre {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            overflow-x: auto;
+            text-align: left;
+        }
+        code {
+            color: #e6edf3;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre;
+        }
+        h2, h3 { margin-top: 0; }
     </style>
 </head>
 <body>
 
-<div class="login-container" id="loginBox">
-    <h2>Личный кабинет</h2>
-    <p>Введите пароль для доступа к сайту:</p>
-    <input type="password" id="passwordInput" placeholder="Пароль">
-    <br>
-    <button onclick="checkPassword()">Войти</button>
-    <div class="error" id="errorMsg"></div>
-</div>
+    <!-- ОКНО АВТОРИЗАЦИИ -->
+    <div class="login-container" id="loginBox">
+        <h2>Личный кабинет</h2>
+        <p>Введите пароль для доступа к кодам ботов:</p>
+        <input type="password" id="passwordInput" placeholder="Пароль">
+        <br>
+        <button onclick="checkPassword()">Войти</button>
+        <div class="error" id="errorMsg"></div>
+    </div>
 
-<div id="secretContent" style="display: none; padding: 20px;">
-    <!-- СЮДА ВСТАВЛЯЙТЕ ВСЁ, ЧТО ХОТИТЕ ВИДЕТЬ НА СВОЁМ САЙТЕ -->
-    <h1>Добро пожаловать!</h1>
-    <p>Это ваш личный секретный сайт, доступный только вам.</p>
-</div>
+    <!-- СКРЫТЫЙ СЕКРЕТНЫЙ КАБИНЕТ -->
+    <div class="cabinet-container" id="secretContent" style="display: none;">
+        <h2 style="color: #2ea043;">🔓 Добро пожаловать в пульт управления!</h2>
+        <p style="color: #8b949e;">Это ваш личный секретный сайт с исходным кодом Telegram-ботов.</p>
+        
+        <h3 style="color: #58a6ff; margin-top: 25px;">💻 Полный код моих Telegram-ботов (Python)</h3>
+        <pre><code id="codeBlock"># -*- coding: utf-8 -*-
+import telebot
+from telebot import types
+import random
+import string
 
-<script>
-function checkPassword() {
-    let password = document.getElementById("passwordInput").value;
-    // ЗАМЕНИТЕ "1234" НА ВАШ СЕКРЕТНЫЙ ПАРОЛЬ
-    let correctPassword = "1234"; 
+# =====================================================================
+# 🤖 БОТ №1: ОРГАНАЙЗЕР И МЕНЕДЖЕР ЗАДАЧ
+# =====================================================================
 
-    if (password === correctPassword) {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("secretContent").style.display = "block";
-        document.body.style.backgroundColor = "#0d1117"; 
-    } else {
-        document.getElementById("errorMsg").innerText = "Неверный пароль!";
-    }
-}
-</script>
+TOKEN_1 = "СЮДА_ВСТАВЬ_ТОКЕН_ПЕРВОГО_БОТА"
+bot1 = telebot.TeleBot(TOKEN_1)
 
+user_tasks = {}
+
+@bot1.message_handler(commands=['start', 'help'])
+def send_welcome_bot1(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("➕ Добавить задачу")
+    btn2 = types.KeyboardButton("📋 Мои задачи")
+    btn3 = types.KeyboardButton("🧹 Очистить всё")
+    markup.add(btn1, btn2, btn3)
+    
+    welcome_text = (
+        f"👋 Привет, {message.from_user.first_name}!\n"
+        "Я твой личный бот-органайзер. Помогу не забыть важные дела."
+    )
+    bot1.send_message(message.chat.id, welcome_text, reply_markup=markup)
+
+@bot1.message_handler(content_types=['text'])
+def handle_tasks(message):
+    chat_id = message.chat.id
+    if chat_id not in user_tasks:
+        user_tasks[chat_id] = []
+
+    if message.text == "➕ Добавить задачу":
+        sent = bot1.send_message(chat_id, "✍️ Напиши текст задачи, которую нужно сохранить:")
+        bot1.register_next_step_handler(sent, save_task)
+    elif message.text == "📋 Мои задачи":
+        if not user_tasks[chat_id]:
+            bot1.send_message(chat_id, "📭 Твой список задач пока пуст!")
+        else:
+            tasks_list = "\n".join([f"{i+1}. {task}" for i, task in enumerate(user_tasks[chat_id])])
+            bot1.send_message(chat_id, f"📝 Твои задачи:\n\n{tasks_list}")
+    elif message.text == "🧹 Очистить всё":
+        user_tasks[chat_id] = []
+        bot1.send_message(chat_id, "🗑️ Список задач успешно очищен!")
+
+def save_task(message):
+    chat_id = message.chat.id
+    if message.text:
+        user_tasks[chat_id].append(message.text)
+        bot1.send_message(chat_id, f"✅ Задача «{message.text}» успешно добавлена!")
+
+
+# =====================================================================
+# 🤖 БОТ №2: ИНСТРУМЕНТЫ (ГЕНЕРАТОР ПАРОЛЕЙ И КАЛЬКУЛЯТОР)
+# =====================================================================
+
+TOKEN_2 = "СЮДА_ВСТАВЬ_ТОКЕН_ВТОРОГО_БОТА"
+bot2 = telebot.TeleBot(TOKEN_2)
+
+@bot2.message_handler(commands=['start'])
+def send_welcome_bot2(message):
+    markup = types.InlineKeyboardMarkup()
+    btn_pass = types.InlineKeyboardButton(text="🔑 Создать пароль", callback_data="gen_pass")
+    btn_calc = types.InlineKeyboardButton(text="🧮 Помощь с расчетами", callback_data="calc_help")
+    markup.add(btn_pass, btn_calc)
+    
+    bot2.send_message(message.chat.id, "Привет! Выберите утилиту:", reply_markup=markup)
+
+@bot2.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    if call.data == "gen_pass":
+        chars = string.ascii_letters + string.digits + "!@#$%^&*"
+        password = "".join(random.choice(chars) for _ in range(12))
+        bot2.send_message(call.message.chat.id, f"🎲 Твой пароль:\n&lt;code&gt;{password}&lt;/code&gt;", parse_mode="HTML")
+    elif call.data == "calc_help":
+        bot2.send_message(call.message.chat.id, "🔢 Используй команду /calc и выражение. Пример: /calc 2*2")
+
+@bot2.message_handler(commands=['calc'])
+def calculate(message):
+    expr = message.text.replace('/calc', '').strip()
+    try:
+        allowed_chars = set("0123456789+-*/() ")
+        if not set(expr).issubset(allowed_chars): raise ValueError()
+        bot2.reply_to(message, f"📊 Результат: {eval(expr)}")
+    except Exception:
+        bot2.reply_to(message, "❌ Ошибка в выражении!")
+</code></pre>
+    </div>
+
+    <!-- СКРИПТ ПРОВЕРКИ ПАРОЛЯ -->
+    <script>
+        function checkPassword() {
+            let password = document.getElementById("passwordInput").value;
+            let correctPassword = "1234";
+
+            if (password === correctPassword) {
+                document.getElementById("loginBox").style.display = "none";
+                document.getElementById("secretContent").style.display = "block";
+                document.body.style.backgroundColor = "#0d1117";
+                document.body.style.alignItems = "flex-start";
+            } else {
+                document.getElementById("errorMsg").innerText = "❌ Неверный пароль!";
+            }
+        }
+    </script>
 </body>
 </html>
-
