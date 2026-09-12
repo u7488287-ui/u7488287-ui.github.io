@@ -99,52 +99,7 @@ import random
 import string
 
 # =====================================================================
-# 🤖 БОТ №1: ОРГАНАЙЗЕР И МЕНЕДЖЕР ЗАДАЧ
-# =====================================================================
-
-TOKEN_1 = "СЮДА_ВСТАВЬ_ТОКЕН_ПЕРВОГО_БОТА"
-bot1 = telebot.TeleBot(TOKEN_1)
-
-user_tasks = {}
-
-@bot1.message_handler(commands=['start', 'help'])
-def send_welcome_bot1(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = types.KeyboardButton("➕ Добавить задачу")
-    btn2 = types.KeyboardButton("📋 Мои задачи")
-    btn3 = types.KeyboardButton("🧹 Очистить всё")
-    markup.add(btn1, btn2, btn3)
-    
-    welcome_text = (
-        f"👋 Привет, {message.from_user.first_name}!\n"
-        "Я твой личный бот-органайзер. Помогу не забыть важные дела."
-    )
-    bot1.send_message(message.chat.id, welcome_text, reply_markup=markup)
-
-@bot1.message_handler(content_types=['text'])
-def handle_tasks(message):
-    chat_id = message.chat.id
-    if chat_id not in user_tasks:
-        user_tasks[chat_id] = []
-
-    if message.text == "➕ Добавить задачу":
-        sent = bot1.send_message(chat_id, "✍️ Напиши текст задачи, которую нужно сохранить:")
-        bot1.register_next_step_handler(sent, save_task)
-    elif message.text == "📋 Мои задачи":
-        if not user_tasks[chat_id]:
-            bot1.send_message(chat_id, "📭 Твой список задач пока пуст!")
-        else:
-            tasks_list = "\n".join([f"{i+1}. {task}" for i, task in enumerate(user_tasks[chat_id])])
-            bot1.send_message(chat_id, f"📝 Твои задачи:\n\n{tasks_list}")
-    elif message.text == "🧹 Очистить всё":
-        user_tasks[chat_id] = []
-        bot1.send_message(chat_id, "🗑️ Список задач успешно очищен!")
-
-def save_task(message):
-    chat_id = message.chat.id
-    if message.text:
-        user_tasks[chat_id].append(message.text)
-        bot1.send_message(chat_id, f"✅ Задача «{message.text}» успешно добавлена!")
+# 🤖 БОТ №1: ОРГАНАЙЗЕР И МЕНЕДЖЕР ЗЗАДА
 </code></pre>
     </div>
 
@@ -166,4 +121,3 @@ def save_task(message):
     </script>
 </body>
 </html>
-
