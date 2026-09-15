@@ -93,7 +93,119 @@
         
         <h3 style="color: #58a6ff; margin-top: 25px;">Шпаргалки по Информатике и Python</h3>
         
-        <pre><code id="codeBlock"></code></pre>
+        <pre><code id="codeBlock">
+            import telebot
+from telebot import types
+
+TOKEN = '8517325739:AAFGZxS4KN7k9jEEBWp_OED9sRPJ_dAflgg'
+bot = telebot.TeleBot(TOKEN)
+
+# --- ГЛАВНОЕ МЕНЮ (КЛАВИАТУРА) ---
+def get_main_keyboard():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    btn_theory = types.KeyboardButton('📘 Теория (Python)')
+    btn_practice = types.KeyboardButton('📝 Практика')
+    btn_math = types.KeyboardButton('🔢 Системы счисления')
+    btn_help = types.KeyboardButton('🆘 Помощь')
+    markup.add(btn_theory, btn_practice, btn_math, btn_help)
+    return markup
+
+# --- КОМАНДА /START ---
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    welcome_text = (
+        f"Привет, {message.from_user.first_name}! 👋\n"
+        f"Я твой виртуальный сосоучитель по информатике.\n"
+        f"Выбери нужный раздел на клавиатуре снизу, чтобы начать прокачку!"
+    )
+    bot.send_message(message.chat.id, welcome_text, reply_markup=get_main_keyboard())
+
+# --- ОБРАБОТКА ТЕКСТОВЫХ КНОПОК ---
+@bot.message_handler(content_types=['text'])
+def handle_menu(message):
+    if message.text == '📘 Теория (Python)':
+        theory_text = (
+            "📖 Базовый синтаксис Python:\n\n"
+            "• Вывод данных: print('Привет!')\n"
+            "• Переменные: x = 5 (тип определяется сам)\n"
+            "• Условия:\n"
+            "if x > 0:\n"
+            "    print('Положительное')\n"
+            "else:\n"
+            "    print('Отрицательное или 0')\n"
+            "• Цикл for: for i in range(5): (повторит 5 раз)"
+        )
+        bot.send_message(message.chat.id, theory_text, parse_mode='Markdown', reply_markup=get_main_keyboard())
+
+    elif message.text == '📝 Практика':
+        task_text = (
+            "🎯 Задача на циклы:\n\n"
+            "Напишите программу, которая находит сумму всех четных чисел от 1 до 10 включительно.\n\n"
+            "Подумайте над решением!"
+        )
+        inline_markup = types.InlineKeyboardMarkup()
+        btn_hint = types.InlineKeyboardButton("💡 Подсказать", callback_data="get_hint")
+        btn_solution = types.InlineKeyboardButton("✅ Показать решение", callback_data="get_solution")
+        inline_markup.add(btn_hint, btn_solution)
+        
+        bot.send_message(message.chat.id, task_text, parse_mode='Markdown', reply_markup=inline_markup)
+
+    elif message.text == '🔢 Системы счисления':
+        math_text = (
+            "🔢 Перевод в двоичную систему (из 10-ичной):\n\n"
+            "Чтобы перевести число в двоичную систему, делите его на 2 нацело и записывайте остатки снизу вверх.\n\n"
+            "💡 Лайфхак на Python:\n"
+            "Используйте функцию bin()\n"
+            "Например: bin(13) вернет '0b1101' (1101 — это 13 в двоичной)."
+        )
+        bot.send_message(message.chat.id, math_text, parse_mode='Markdown', reply_markup=get_main_keyboard())
+
+    elif message.text == '🆘 Помощь':
+        help_text = (
+            "🤖 Нужна помощь человека?\n\n"
+            "Если у вас возник вопрос по задаче, который я не могу решить, или вы нашли ошибку — "
+            "напишите вашему учителю напрямую.\n\n"
+            "А пока можете вернуться к изучению теории!"
+        )
+        bot.send_message(message.chat.id, help_text, parse_mode='Markdown', reply_markup=get_main_keyboard())
+
+    else:
+        bot.send_message(
+            message.chat.id, 
+            "Используйте кнопки меню для навигации! 🧭", 
+            reply_markup=get_main_keyboard()
+        )
+
+# --- ОБРАБОТКА ИНЛАЙН-КНОПОК (ПОД ЗАДАЧЕЙ) ---
+@bot.callback_query_handler(func=lambda call: True)
+def handle_inline_buttons(call):
+    if call.data == "get_hint":
+        hint_text = (
+            "💡 Подсказка:\n"
+            "Переберите числа с помощью `for i in range(1, 11):`, "
+            "проверяйте каждое число на четность с помощью `i % 2 == 0` и складывайте их в переменную-счетчик."
+        )
+        bot.send_message(call.message.chat.id, hint_text, parse_mode='Markdown')
+        bot.answer_callback_query(call.id)
+
+    elif call.data == "get_solution":
+        solution_text = (
+            "✅ Правильное решение на Python:\n\n"
+            "сумма = 0\n"
+            "for i in range(1, 11):\n"
+            "    if i % 2 == 0:\n"
+            "        сумма += i\n"
+            "print(сумма) # Выведет 30"
+        )
+        bot.send_message(call.message.chat.id, solution_text, parse_mode='Markdown')
+        bot.answer_callback_query(call.id)
+
+# --- ЗАПУСК БОТА ---
+if __name__ == '__main__':
+    print("Бот успешно запущен и слушает команды...")
+    bot.infinity_polling()
+
+        </code></pre>
     </div>
 
     <!-- СКРИПТ ПРОВЕРКИ ПАРОЛЯ -->
